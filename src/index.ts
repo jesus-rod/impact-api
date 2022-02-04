@@ -1,25 +1,26 @@
-import { ARRAY_OPERATORS, MikroORM } from '@mikro-orm/core';
+import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import { buildSchema } from 'type-graphql';
-import { __prod__ } from './constants';
+import { createConnection } from 'typeorm';
 import { Activity } from './entities/Activity';
-import mikroConfig from './mikro-orm.config';
 import { ActivityResolver } from './resolvers/activity';
 import { HelloResolver } from './resolvers/hello';
+import path from 'path';
 
 const main = async () => {
-  const orm = await MikroORM.init(mikroConfig);
+  const connection = await createConnection({
+    type: 'postgres',
+    database: 'impact-server',
+    username: 'postgres',
+    password: 'postgres',
+    logging: true,
+    synchronize: true,
+    // migrations: [path.join(__dirname, './migrations/*')],
+    entities: [Activity],
+  });
 
-  orm.getMigrator().up();
-  // const activity = orm.em.create(Activity, {
-  //     title: 'travelled somewhere',
-  //     consumption: 5,
-  // });
-  // await orm.em.persistAndFlush(activity);
-
-  const activities = await orm.em.find(Activity, {});
-  console.log(activities);
+  // await connection.runMigrations();
 
   const app = express();
 
@@ -28,7 +29,7 @@ const main = async () => {
       resolvers: [HelloResolver, ActivityResolver],
       validate: false,
     }),
-    context: () => ({ em: orm.em }),
+    context: () => ({}),
   });
 
   await apolloServer.start();
