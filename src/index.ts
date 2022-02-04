@@ -6,10 +6,11 @@ import { createConnection } from 'typeorm';
 import { Activity } from './entities/Activity';
 import { ActivityResolver } from './resolvers/activity';
 import { HelloResolver } from './resolvers/hello';
-import path from 'path';
+// import path from 'path';
 
 const main = async () => {
-  const connection = await createConnection({
+  // const connection =
+  await createConnection({
     type: 'postgres',
     database: 'impact-server',
     username: 'postgres',
